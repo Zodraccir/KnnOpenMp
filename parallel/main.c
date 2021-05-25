@@ -4,9 +4,17 @@
 #include <math.h>
 #include <omp.h>
 
+#define K 150
+#define NUMBER_OF_THREADS 4
+char FILEPATHTRAINING[] = "iris6k.txt";
+char FILEPATHTEST[] = "test.txt";
+
+
 #define NUMBER_ATTRS 4
 #define NUMBER_OF_CLUSTER 3
 #define NUMBER_OF_SPLIT 4
+
+
 
 struct row {
 	double attrs[NUMBER_ATTRS];
@@ -171,7 +179,7 @@ void performKnn(struct row * trainingSet, struct row * testSet,int k,int sizeTra
     for (int i=0; i<sizeTest; i++)
          distance[i] = (double *)malloc(sizeTraining * sizeof(double));
      
-     #pragma omp parallel for collapse(2) schedule(dynamic)
+     #pragma omp parallel for
      for(int ii=0;ii<sizeTest;ii++){
      
 	for(int t = 0 ; t<sizeTraining ; t++){
@@ -180,7 +188,7 @@ void performKnn(struct row * trainingSet, struct row * testSet,int k,int sizeTra
       }
       
       
-      #pragma omp parallel for schedule(dynamic)
+      #pragma omp parallel for
       for(int ii=0;ii<sizeTest;ii++){          
 	classifyPointFromDistance(trainingSet, &testSet[ii], distance[ii],k,sizeTraining);
     }
@@ -228,7 +236,7 @@ int main(int argc, char *argv[]){
 	tstart = omp_get_wtime();
 
 	omp_set_dynamic(0);
-	omp_set_num_threads(4);
+	omp_set_num_threads(NUMBER_OF_THREADS);
 
  
 
@@ -238,13 +246,12 @@ int main(int argc, char *argv[]){
 	
 	
 
-	struct row *trainingSet = loadDataset("irisPD.txt", &sizeTraining,1);
+	struct row *trainingSet = loadDataset( FILEPATHTRAINING , &sizeTraining,1);
 	//printPixels(trainingSet,sizeTraining);
 	
-	struct row *testSet = loadDataset("test.txt", &sizeTest,0);
+	struct row *testSet = loadDataset( FILEPATHTEST , &sizeTest,0);
 	
 	
-	int K=50;
 	
 	double bestK[K-1];
 	
