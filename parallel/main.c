@@ -235,7 +235,6 @@ int main(int argc, char *argv[]){
 	double tstart, tstop;
 	tstart = omp_get_wtime();
 
-	omp_set_dynamic(0);
 	omp_set_num_threads(NUMBER_OF_THREADS);
 
  
